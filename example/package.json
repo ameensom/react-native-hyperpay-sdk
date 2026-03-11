@@ -1,6 +1,6 @@
 {
-  "name": "react-native-hyperpay-sdk-example",
-  "description": "Example app for react-native-hyperpay-sdk",
+  "name": "react-native-afspay-sdk-example",
+  "description": "Example app for react-native-afspay-sdk",
   "version": "0.0.1",
   "private": true,
   "scripts": {

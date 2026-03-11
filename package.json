@@ -1,7 +1,7 @@
 {
-  "name": "react-native-hyperpay-sdk",
+  "name": "react-native-afspay-sdk",
   "version": "0.39.0",
-  "description": "hyperpay",
+  "description": "afspay",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/index.d.ts",
@@ -13,7 +13,7 @@
     "android",
     "ios",
     "cpp",
-    "react-native-hyperpay-sdk.podspec",
+    "react-native-afspay-sdk.podspec",
     "ipworks3ds_sdk.xcframework",
     "OPPWAMobile.xcframework",
     "!lib/typescript/example",
@@ -36,19 +36,19 @@
     "react-native",
     "ios",
     "android",
-    "react-native-hyperpay-sdk",
-    "hyperpay",
+    "react-native-afspay-sdk",
+    "afspay",
     "payment",
     "apple-pay",
-    "react-native-hyperpay"
+    "react-native-afspay"
   ],
-  "repository": "https://github.com/ameensom/react-native-hyperpay-sdk",
+  "repository": "https://github.com/ameensom/react-native-afspay-sdk",
   "author": "ameensom <amin4mail@yahoo.com> (https://github.com/ameensom)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ameensom/react-native-hyperpay-sdk/issues"
+    "url": "https://github.com/ameensom/react-native-afspay-sdk/issues"
   },
-  "homepage": "https://github.com/ameensom/react-native-hyperpay-sdk#readme",
+  "homepage": "https://github.com/ameensom/react-native-afspay-sdk#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
@@ -150,7 +150,5 @@
       ]
     ]
   },
-  "dependencies": {
-    "react-native-hyperpay-sdk": "github:ameensom/react-native-hyperpay-sdk"
-  }
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
