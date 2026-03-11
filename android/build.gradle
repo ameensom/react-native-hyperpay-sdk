@@ -22,10 +22,10 @@ def safeExtGet(prop, fallback) {
 }
 
 android {
-    compileSdkVersion safeExtGet('HyperPay_compileSdkVersion', 31)
+    compileSdkVersion safeExtGet('AFSPay_compileSdkVersion', 31)
     defaultConfig {
-        minSdkVersion safeExtGet('HyperPay_minSdkVersion', 21)
-        targetSdkVersion safeExtGet('HyperPay_targetSdkVersion', 29)
+        minSdkVersion safeExtGet('AFSPay_minSdkVersion', 21)
+        targetSdkVersion safeExtGet('AFSPay_targetSdkVersion', 29)
         versionCode 1
         versionName "1.0"
 

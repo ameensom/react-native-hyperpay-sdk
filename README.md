@@ -1,17 +1,17 @@
-# react-native-hyperpay-sdk
+# react-native-afspay-sdk
 
-hyperpay
+afspay
 
 ## Installation
 
 ```sh
-npm i react-native-hyperpay-sdk
+npm i react-native-afspay-sdk
 ```
 
 ## Usage
 
 ```js
-import HyperPay from 'react-native-hyperpay-sdk'
+import AFSPay from 'react-native-afspay-sdk'
 
 // the firt step , set default configiration 
 // 1- shopperResultURL to redirect to this url after the payment completed
