@@ -4,11 +4,11 @@ import { StyleSheet, View, Text } from 'react-native';
 import { applePay } from 'react-native-hyperpay-sdk';
 
 export default function App() {
-  const [result, setResult] = React.useState<string>("");
+  const [result, setResult] = React.useState<string>('');
   React.useEffect(() => {
-    applePay("CheckoutId").then((res: any) => {
-      setResult(res)
-    })
+    applePay({ checkoutID: 'CheckoutId' }).then((res: any) => {
+      setResult(res);
+    });
   }, []);
 
   return (
