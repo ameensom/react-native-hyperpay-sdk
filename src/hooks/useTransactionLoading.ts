@@ -1,22 +1,23 @@
 import { useEffect, useState } from 'react';
 import { eventEmitter } from '../utils';
 
-let isCalledTransactionLoading: boolean = false
+let isCalledTransactionLoading: boolean = false;
 
 export function useTransactionLoading() {
-    const [loading, setLoading] = useState(false)
-    useEffect(() => {
-        if (!isCalledTransactionLoading) {
-            const _event = eventEmitter.addListener('onProgress', (isLoading: boolean) => {
-                setLoading(isLoading)
-                if (!isLoading) _event.remove(); isCalledTransactionLoading = false
-            })
-            isCalledTransactionLoading = true
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (!isCalledTransactionLoading) {
+      const _event = eventEmitter.addListener(
+        'onProgress',
+        (isLoading: boolean) => {
+          setLoading(isLoading);
+          if (!isLoading) _event.remove();
+          isCalledTransactionLoading = false;
         }
-    }, [isCalledTransactionLoading])
-    return loading
+      );
+      isCalledTransactionLoading = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCalledTransactionLoading]);
+  return loading;
 }
-
-
-
-

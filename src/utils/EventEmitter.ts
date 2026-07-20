@@ -1,4 +1,4 @@
-import { NativeEventEmitter } from "react-native";
+import { NativeEventEmitter } from 'react-native';
 // Import directly from the module, NOT from the "../utils" barrel.
 //
 // The barrel (utils/index.ts) re-exports ./EventEmitter BEFORE ./NativeModules.
@@ -12,6 +12,6 @@ import { NativeEventEmitter } from "react-native";
 //
 // at import time — before React renders, taking down any app that imports this
 // package at module scope. Depending on the module directly breaks the cycle.
-import { HyperPaySDK } from "./NativeModules";
+import { HyperPaySDK } from './NativeModules';
 
 export const eventEmitter = new NativeEventEmitter(HyperPaySDK);
