@@ -60,3 +60,5 @@ android/keystores/debug.keystore
 # Expo
 .expo/*
 
+.claude/
+.tldr/
