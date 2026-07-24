@@ -2,10 +2,12 @@
 #import <Foundation/Foundation.h>
 #import "HyperPay.h"
 #import <React/RCTLog.h>
+#import <PassKit/PassKit.h>
 
 @implementation HyperPay
 
 OPPPaymentProvider *provider;
+OPPCheckoutProvider *checkoutProvider; // must be retained for the whole async Apple Pay flow
 NSString *shopperResultURL = @"";
 NSString *merchantIdentifier = @"";
 NSString *countryCode = @"";
@@ -61,7 +63,7 @@ RCT_EXPORT_METHOD(createPaymentTransaction: (NSDictionary*)options resolver:(RCT
                                                                               number:[options valueForKey:@"cardNumber"]
                                                                          expiryMonth:[options valueForKey:@"expiryMonth"]
                                                                           expiryYear:[options valueForKey:@"expiryYear"]
-                                                                                 CVV:[options valueForKey:@"cvv"]
+                                                                                 cvv:[options valueForKey:@"cvv"]
                                                                                error:&error];
 
     if (error) {
@@ -104,21 +106,47 @@ RCT_EXPORT_METHOD(applePay:(NSDictionary*)params resolver:(RCTPromiseResolveBloc
   
   OPPCheckoutSettings *checkoutSettings = [[OPPCheckoutSettings alloc] init];
   PKPaymentRequest *paymentRequest = [OPPPaymentProvider paymentRequestWithMerchantIdentifier:merchantIdentifier countryCode:countryCode];
-  paymentRequest.supportedNetworks = supportedNetworks;
-  
 
-    if ([params valueForKey:@"companyName"]){
-        companyName=[params valueForKey:@"companyName"];
-       }
-        NSDecimalNumber *amount = [NSDecimalNumber decimalNumberWithMantissa:[[params valueForKey:@"amount"] intValue] exponent:-2 isNegative:NO];
-        paymentRequest.paymentSummaryItems = @[[PKPaymentSummaryItem summaryItemWithLabel:companyName amount:amount]];
- 
-    
+  // A PKPaymentRequest with no currencyCode is invalid, so iOS cannot build the Apple Pay
+  // sheet and OPP swallows it without calling any handler (the silent spinner). OPP's helper
+  // sets countryCode but NOT currencyCode, so set them explicitly here.
+  paymentRequest.countryCode = (countryCode.length > 0) ? countryCode : @"SA";
+  paymentRequest.currencyCode = @"SAR";
+  paymentRequest.merchantCapabilities = PKMerchantCapability3DS;
+
+  // Map the raw network strings (e.g. lowercase 'mada') to valid PKPaymentNetwork constants.
+  // Assigning raw strings makes the PKPaymentRequest invalid, so the Apple Pay sheet never presents.
+  NSMutableArray<PKPaymentNetwork> *pkNetworks = [NSMutableArray array];
+  for (NSString *n in supportedNetworks) {
+    NSString *low = [[n description] lowercaseString];
+    if ([low isEqualToString:@"visa"]) { [pkNetworks addObject:PKPaymentNetworkVisa]; }
+    else if ([low isEqualToString:@"mastercard"] || [low isEqualToString:@"master"]) { [pkNetworks addObject:PKPaymentNetworkMasterCard]; }
+    else if ([low isEqualToString:@"mada"]) { if (@available(iOS 12.1.1, *)) { [pkNetworks addObject:PKPaymentNetworkMada]; } }
+    else if ([low isEqualToString:@"amex"] || [low isEqualToString:@"americanexpress"]) { [pkNetworks addObject:PKPaymentNetworkAmex]; }
+  }
+  if (pkNetworks.count > 0) {
+    paymentRequest.supportedNetworks = pkNetworks;
+  }
+
+  if ([params valueForKey:@"companyName"]){
+      companyName=[params valueForKey:@"companyName"];
+  }
+  // amount arrives as a major-unit string (e.g. "18" = 18.00 SAR); parse it directly instead
+  // of treating it as minor units (the old intValue * 10^-2 turned "18" into 0.18).
+  NSDecimalNumber *amount = [NSDecimalNumber decimalNumberWithString:[params valueForKey:@"amount"]];
+  if (amount == nil || [amount isEqualToNumber:[NSDecimalNumber notANumber]]) {
+    amount = [NSDecimalNumber zero];
+  }
+  paymentRequest.paymentSummaryItems = @[[PKPaymentSummaryItem summaryItemWithLabel:companyName amount:amount]];
+
+
   checkoutSettings.shopperResultURL=shopperResultURL;
   checkoutSettings.applePayPaymentRequest = paymentRequest;
-  OPPCheckoutProvider *checkoutProvider = [OPPCheckoutProvider checkoutProviderWithPaymentProvider:provider
-                                                                                        checkoutID:[params valueForKey:@"checkoutID"]
-                                                                                          settings:checkoutSettings];
+  // Assign to the retained file-scope variable (NOT a local) so the provider survives the
+  // async present flow; a local would be deallocated immediately and the checkout would die.
+  checkoutProvider = [OPPCheckoutProvider checkoutProviderWithPaymentProvider:provider
+                                                                   checkoutID:[params valueForKey:@"checkoutID"]
+                                                                     settings:checkoutSettings];
 
   [checkoutProvider presentCheckoutWithPaymentBrand:@"APPLEPAY"
     loadingHandler:^(BOOL inProgress) {
@@ -136,9 +164,11 @@ RCT_EXPORT_METHOD(applePay:(NSDictionary*)params resolver:(RCTPromiseResolveBloc
           else
               resolve(@{@"resourcePath": transaction.resourcePath});
       }
+      checkoutProvider = nil;
   } cancelHandler:^{
        reject(@"applePay",@"cancel",NULL);
       // Executed if the shopper closes the payment page prematurely.
+       checkoutProvider = nil;
   }];
 
 }
