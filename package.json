@@ -1,6 +1,6 @@
 {
   "name": "react-native-hyperpay-sdk",
-  "version": "0.40.1",
+  "version": "0.40.2",
   "description": "hyperpay",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -149,8 +149,5 @@
         }
       ]
     ]
-  },
-  "dependencies": {
-    "react-native-hyperpay-sdk": "github:ameensom/react-native-hyperpay-sdk"
   }
 }
